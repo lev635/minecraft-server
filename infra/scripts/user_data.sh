@@ -24,7 +24,7 @@ while [ ! -b ${EBS_DEVICE_NAME} ]; do
 done
 
 # Check if the volume is already formatted
-if ! file -s ${EBS_DEVICE_NAME} | grep -q "XFS"; then
+if ! lsblk -f ${EBS_DEVICE_NAME} | grep -q "xfs"; then
     echo "Formatting EBS volume with XFS..."
     mkfs -t xfs ${EBS_DEVICE_NAME}
 fi
