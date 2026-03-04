@@ -7,12 +7,12 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 # Variables
 readonly MOUNT_POINT="/minecraft"
 readonly EBS_DEVICE_NAME="/dev/sdf" 
-readonly MINECRAFT_VERSION="1.20.4"
+readonly MINECRAFT_VERSION="1.21.11"
 
 # Update packages and install dependencies
 echo "Updating packages and installing dependencies..."
 yum update -y
-yum install -y java-17-amazon-corretto-headless screen
+yum install -y java-21-amazon-corretto-headless screen
 
 # --- EBS Volume Setup ---
 echo "Setting up EBS volume..."
@@ -53,7 +53,8 @@ echo "Setting up Minecraft server in ${MOUNT_POINT}..."
 # Download Minecraft server jar if it doesn't exist
 if [ ! -f "server.jar" ]; then
     echo "Downloading Minecraft server version ${MINECRAFT_VERSION}..."
-    wget "https://piston-data.mojang.com/v1/objects/5b86b2de5742b2ab8783f946fe1b4697bde42fde/server.jar" -O server.jar
+    # Updated URL for 1.21.11
+    wget "https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar" -O server.jar
 fi
 
 # Agree to EULA
@@ -61,6 +62,7 @@ echo "eula=true" > eula.txt
 
 # Start Minecraft server in a detached screen session as ec2-user
 echo "Starting Minecraft server..."
+# Use Java 21 for Minecraft 1.21+
 sudo -u ec2-user bash -c "cd ${MOUNT_POINT} && screen -S minecraft -d -m java -Xmx2G -Xms1G -jar server.jar nogui"
 
 echo "User data script finished."
